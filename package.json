@@ -1,0 +1,8 @@
+{
+  "name": "@lcod/registry",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node scripts/update-registry.mjs"
+  }
+}

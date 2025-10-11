@@ -1,0 +1,69 @@
+name: Sync Registry Catalogue
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[registry ci]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout registry
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout lcod-spec
+        uses: actions/checkout@v4
+        with:
+          repository: lcod-team/lcod-spec
+          path: lcod-spec
+
+      - name: Checkout lcod-kernel-js
+        uses: actions/checkout@v4
+        with:
+          repository: lcod-team/lcod-kernel-js
+          path: lcod-kernel-js
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate catalogue
+        env:
+          SPEC_REPO_PATH: ${{ github.workspace }}/lcod-spec
+          KERNEL_REPO_PATH: ${{ github.workspace }}/lcod-kernel-js
+        run: |
+          npm run generate
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            git status --short
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail on drift (pull_request)
+        if: github.event_name == 'pull_request' && steps.diff.outputs.changed == 'true'
+        run: |
+          echo "Catalogue out of date. Run 'npm run generate' and commit the results." >&2
+          exit 1
+
+      - name: Commit catalogue update
+        if: github.event_name == 'push' && steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "lcod-registry-bot"
+          git config user.email "ops@lcod.team"
+          git commit -am "chore(registry): sync catalogue [registry ci]"
+          git push

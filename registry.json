@@ -1,0 +1,35 @@
+{
+  "schema": "lcod-registry@1",
+  "registries": [
+    {
+      "id": "official",
+      "type": "git",
+      "url": "https://github.com/lcod-team/lcod-registry"
+    }
+  ],
+  "namespaces": {
+    "lcod": {
+      "owners": [
+        "github:lcod-team"
+      ],
+      "requireSignature": false
+    },
+    "tooling": {
+      "owners": [
+        "github:lcod-team"
+      ],
+      "requireSignature": false
+    }
+  },
+  "packages": {
+    "lcod://tooling/registry/catalog/generate": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry/source/load": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry/resolution": {
+      "registry": "official"
+    }
+  }
+}

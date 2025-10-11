@@ -1,0 +1,39 @@
+{
+  "schema": "lcod-registry/manifest@1",
+  "id": "lcod://tooling/registry/source/load@0.1.0",
+  "publishedAt": "2025-10-11T00:00:00Z",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/lcod-team/lcod-spec",
+    "commit": "0a31293b44a1ded02f62518b71eec5bf1bc57dc0",
+    "path": "tooling/registry/source"
+  },
+  "files": [
+    {
+      "path": "tooling/registry/source/compose.yaml",
+      "sha256": "2646362caa979657a82e999dfc076eb7ee8e6ebfbfb7d5c0e2c05f1e2b9f0303",
+      "size": 7518
+    },
+    {
+      "path": "tooling/registry/source/lcp.toml",
+      "sha256": "283a4b3deafa0e05b2c987367b949fc9db2993e45ebeafbb91c59cec5d12b79e",
+      "size": 652
+    },
+    {
+      "path": "tooling/registry/source/README.md",
+      "sha256": "3d1d73cd74fc8b704c16e70ecec0226fcad8f1543f6e8a8e316361a62fadda7b",
+      "size": 1475
+    },
+    {
+      "path": "tooling/registry/source/schema/source_load.in.json",
+      "sha256": "8fb3be4f1b4262b9d47dc1ef73403281a4909dd494d3daf991f428fc62a2bcdb",
+      "size": 1185
+    },
+    {
+      "path": "tooling/registry/source/schema/source_load.out.json",
+      "sha256": "b0fe331229fe89ab47b22d385a42f3183b18af3c628846de552985277429fedb",
+      "size": 780
+    }
+  ],
+  "dependencies": []
+}

@@ -1,0 +1,4 @@
+{"kind":"registry","id":"official","type":"git","url":"https://github.com/lcod-team/lcod-registry"}
+{"kind":"component","id":"lcod://tooling/registry/catalog/generate","version":"0.1.0","manifest":"packages/tooling/registry/catalog/0.1.0/manifest.json","registryId":"official"}
+{"kind":"component","id":"lcod://tooling/registry/source/load","version":"0.1.0","manifest":"packages/tooling/registry/source/0.1.0/manifest.json","registryId":"official"}
+{"kind":"component","id":"lcod://tooling/registry/resolution","version":"0.1.0","manifest":"packages/tooling/registry/resolution/0.1.0/manifest.json","registryId":"official"}

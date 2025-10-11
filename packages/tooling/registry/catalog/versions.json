@@ -1,0 +1,10 @@
+{
+  "schema": "lcod-registry/versions@1",
+  "id": "lcod://tooling/registry/catalog/generate",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "manifest": "packages/tooling/registry/catalog/0.1.0/manifest.json"
+    }
+  ]
+}
