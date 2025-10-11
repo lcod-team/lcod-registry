@@ -2,3 +2,6 @@
 {"kind":"component","id":"lcod://tooling/registry/catalog/generate","version":"0.1.0","manifest":"packages/tooling/registry/catalog/0.1.0/manifest.json","registryId":"official"}
 {"kind":"component","id":"lcod://tooling/registry/source/load","version":"0.1.0","manifest":"packages/tooling/registry/source/0.1.0/manifest.json","registryId":"official"}
 {"kind":"component","id":"lcod://tooling/registry/resolution","version":"0.1.0","manifest":"packages/tooling/registry/resolution/0.1.0/manifest.json","registryId":"official"}
+{"kind":"component","id":"lcod://tooling/registry/index","version":"0.1.0","manifest":"packages/tooling/registry/index/0.1.0/manifest.json","registryId":"official"}
+{"kind":"component","id":"lcod://tooling/registry/select","version":"0.1.0","manifest":"packages/tooling/registry/select/0.1.0/manifest.json","registryId":"official"}
+{"kind":"component","id":"lcod://tooling/registry/fetch","version":"0.1.0","manifest":"packages/tooling/registry/fetch/0.1.0/manifest.json","registryId":"official"}

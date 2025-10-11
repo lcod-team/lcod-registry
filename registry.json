@@ -30,6 +30,15 @@
     },
     "lcod://tooling/registry/resolution": {
       "registry": "official"
+    },
+    "lcod://tooling/registry/index": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry/select": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry/fetch": {
+      "registry": "official"
     }
   }
 }

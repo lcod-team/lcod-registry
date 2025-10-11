@@ -22,6 +22,21 @@
       "id": "lcod://tooling/registry/resolution",
       "registryId": "official",
       "versionsPath": "packages/tooling/registry/resolution/versions.json"
+    },
+    {
+      "id": "lcod://tooling/registry/index",
+      "registryId": "official",
+      "versionsPath": "packages/tooling/registry/index/versions.json"
+    },
+    {
+      "id": "lcod://tooling/registry/select",
+      "registryId": "official",
+      "versionsPath": "packages/tooling/registry/select/versions.json"
+    },
+    {
+      "id": "lcod://tooling/registry/fetch",
+      "registryId": "official",
+      "versionsPath": "packages/tooling/registry/fetch/versions.json"
     }
   ]
 }
