@@ -37,6 +37,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Validate registry
+        run: npm run validate
+
       - name: Generate catalogue
         env:
           SPEC_REPO_PATH: ${{ github.workspace }}/lcod-spec

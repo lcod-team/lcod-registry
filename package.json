@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate": "node scripts/update-registry.mjs"
+    "generate": "node scripts/update-registry.mjs",
+    "validate": "node scripts/validate-registry.mjs"
   }
 }
