@@ -14,6 +14,7 @@ compose:
           console.log('manifest parsed keys', Object.keys(manifestParsed || {}));
           const components = [];
           const entries = manifestParsed?.value?.workspace?.components;
+          console.log('workspace components entries', Array.isArray(entries) ? entries.length : 'none');
           if (Array.isArray(entries)) {
             for (const entry of entries) {
               if (!entry || typeof entry !== 'object') continue;
