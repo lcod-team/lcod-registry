@@ -14,38 +14,26 @@ jobs:
   generate:
     if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[registry ci]')
     runs-on: ubuntu-latest
+    env:
+      LCOD_REGISTRY_ROOT: ${{ github.workspace }}
     steps:
       - name: Checkout registry
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Checkout lcod-spec
-        uses: actions/checkout@v4
-        with:
-          repository: lcod-team/lcod-spec
-          path: lcod-spec
-
-      - name: Checkout lcod-kernel-js
-        uses: actions/checkout@v4
-        with:
-          repository: lcod-team/lcod-kernel-js
-          path: lcod-kernel-js
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - name: Download run_compose
+        run: |
+          curl -sSL https://github.com/lcod-team/lcod-kernel-rs/releases/download/run-compose-v0.1.1/run-compose-linux-x86_64.tar.gz -o run-compose.tar.gz
+          tar -xzf run-compose.tar.gz
+          chmod +x run-compose
+          echo "LCOD_HOME=$PWD/runtime" >> "$GITHUB_ENV"
 
       - name: Validate registry
-        run: npm run validate
+        run: ./run-compose --compose scripts/validate-registry.lcp.yaml
 
       - name: Generate catalogue
-        env:
-          SPEC_REPO_PATH: ${{ github.workspace }}/lcod-spec
-          KERNEL_REPO_PATH: ${{ github.workspace }}/lcod-kernel-js
-        run: |
-          npm run generate
+        run: ./run-compose --compose scripts/update-registry.lcp.yaml
 
       - name: Detect changes
         id: diff

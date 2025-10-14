@@ -7,6 +7,24 @@ compose:
     out:
       refreshResult: $
 
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ state }) => {
+          const errors = Array.isArray(state.errors) ? state.errors : [];
+          const warnings = Array.isArray(state.warnings) ? state.warnings : [];
+          if (errors.length > 0) {
+            throw new Error(`Registry refresh failed:\n${errors.join('\n')}`);
+          }
+          return { errors, warnings };
+        }
+      input:
+        errors: $.refreshResult.errors
+        warnings: $.refreshResult.warnings
+    out:
+      sanitizedErrors: errors
+      sanitizedWarnings: warnings
+
   - call: lcod://tooling/registry_catalog.write_outputs@0.1.0
     in:
       rootPath: $env.LCOD_REGISTRY_ROOT ?? '.'
@@ -17,8 +35,8 @@ compose:
 
   - call: lcod://impl/set@1
     in:
-      errors: $.refreshResult.errors
-      warnings: $.refreshResult.warnings
+      errors: $.sanitizedErrors
+      warnings: $.sanitizedWarnings
       updates: $.writeUpdates
     out:
       errors: errors
