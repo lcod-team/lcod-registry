@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LCOD_REGISTRY_ROOT: ${{ github.workspace }}
+      LCOD_RESOLVER_PATH: ${{ github.workspace }}/lcod-components
     steps:
       - name: Checkout registry
         uses: actions/checkout@v4
@@ -28,19 +29,21 @@ jobs:
           repository: lcod-team/lcod-components
           path: lcod-components
 
+      - name: Configure component workspace
+        run: echo "LCOD_RESOLVER_PATH=$GITHUB_WORKSPACE/lcod-components" >> "$GITHUB_ENV"
+
       - name: Download run_compose
         run: |
           curl -sSL https://github.com/lcod-team/lcod-kernel-rs/releases/download/run-compose-v0.1.1/run-compose-linux-x86_64.tar.gz -o run-compose.tar.gz
           tar -xzf run-compose.tar.gz
           chmod +x run-compose
           echo "LCOD_HOME=$PWD/runtime" >> "$GITHUB_ENV"
-          echo "LCOD_RESOLVER_PATH=$PWD/lcod-components" >> "$GITHUB_ENV"
 
       - name: Validate registry
-        run: ./run-compose --compose scripts/validate-registry.lcp.yaml
+        run: ./run-compose --project lcod-components/packages/std --compose scripts/validate-registry.lcp.yaml
 
       - name: Generate catalogue
-        run: ./run-compose --compose scripts/update-registry.lcp.yaml
+        run: ./run-compose --project lcod-components/packages/std --compose scripts/update-registry.lcp.yaml
 
       - name: Detect changes
         id: diff
