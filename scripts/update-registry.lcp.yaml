@@ -3,9 +3,9 @@ compose:
   - call: lcod://tooling/script@1
     in:
       source: |
-        async ({ state, imports }) => {
-          const root = typeof state.componentsRoot === 'string' && state.componentsRoot.length > 0
-            ? state.componentsRoot
+        async ({ imports }) => {
+          const root = process.env.LCOD_RESOLVER_PATH && process.env.LCOD_RESOLVER_PATH.length > 0
+            ? process.env.LCOD_RESOLVER_PATH
             : '.';
           const manifestPath = await imports.pathJoin({ base: root, segment: 'packages/std/lcp.toml' });
           console.log('register-components manifest', manifestPath.path);
@@ -26,8 +26,6 @@ compose:
           }
           return { components };
         }
-      input:
-        componentsRoot: $env.LCOD_RESOLVER_PATH ?? '.'
       imports:
         pathJoin: lcod://axiom/path/join@1
         fsReadFile: lcod://axiom/fs/read-file@1
