@@ -1,5 +1,44 @@
 
 compose:
+  - call: lcod://tooling/script@1
+    in:
+      source: |
+        async ({ state, imports }) => {
+          const root = typeof state.componentsRoot === 'string' && state.componentsRoot.length > 0
+            ? state.componentsRoot
+            : '.';
+          const manifestPath = await imports.pathJoin({ base: root, segment: 'packages/std/lcp.toml' });
+          const manifestRaw = await imports.fsReadFile({ path: manifestPath.path, encoding: 'utf-8' });
+          const manifestParsed = await imports.tomlParse({ text: manifestRaw.data ?? manifestRaw });
+          const components = [];
+          const entries = manifestParsed?.value?.workspace?.components;
+          if (Array.isArray(entries)) {
+            for (const entry of entries) {
+              if (!entry || typeof entry !== 'object') continue;
+              const id = typeof entry.id === 'string' && entry.id.length > 0 ? entry.id : null;
+              const relPath = typeof entry.path === 'string' && entry.path.length > 0 ? entry.path : null;
+              if (!id || !relPath) continue;
+              const composePath = await imports.pathJoin({ base: root, segment: `${relPath}/compose.yaml` });
+              components.push({ id, composePath: composePath.path });
+            }
+          }
+          return { components };
+        }
+      input:
+        componentsRoot: $env.LCOD_RESOLVER_PATH ?? '.'
+      imports:
+        pathJoin: lcod://axiom/path/join@1
+        fsReadFile: lcod://axiom/fs/read-file@1
+        tomlParse: lcod://axiom/toml/parse@1
+    out:
+      componentDefs: components
+
+  - call: lcod://tooling/resolver/register@1
+    in:
+      components: $.componentDefs
+    out:
+      registeredComponents: registered
+
   - call: lcod://tooling/registry_catalog.validate@0.1.0
     in:
       rootPath: $env.LCOD_REGISTRY_ROOT ?? '.'
