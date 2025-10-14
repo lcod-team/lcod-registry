@@ -37,6 +37,13 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install registry dependencies
+        run: npm ci
+
+      - name: Install kernel dependencies
+        run: npm ci
+        working-directory: lcod-kernel-js
+
       - name: Validate registry
         run: npm run validate
 
