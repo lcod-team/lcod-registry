@@ -17,6 +17,7 @@ jobs:
     env:
       LCOD_REGISTRY_ROOT: ${{ github.workspace }}
       LCOD_RESOLVER_PATH: ${{ github.workspace }}/lcod-components
+      LCOD_RESOLVER_COMPONENTS_PATH: ${{ github.workspace }}/lcod-components/packages/std/components
     steps:
       - name: Checkout registry
         uses: actions/checkout@v4
@@ -30,7 +31,9 @@ jobs:
           path: lcod-components
 
       - name: Configure component workspace
-        run: echo "LCOD_RESOLVER_PATH=$GITHUB_WORKSPACE/lcod-components" >> "$GITHUB_ENV"
+        run: |
+          echo "LCOD_RESOLVER_PATH=$GITHUB_WORKSPACE/lcod-components" >> "$GITHUB_ENV"
+          echo "LCOD_RESOLVER_COMPONENTS_PATH=$GITHUB_WORKSPACE/lcod-components/packages/std/components" >> "$GITHUB_ENV"
 
       - name: Download run_compose
         run: |
