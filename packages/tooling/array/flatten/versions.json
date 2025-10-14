@@ -1,0 +1,10 @@
+{
+  "schema": "lcod-registry/versions@1",
+  "id": "lcod://tooling/array/flatten",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "manifest": "packages/tooling/array/flatten/0.1.0/manifest.json"
+    }
+  ]
+}

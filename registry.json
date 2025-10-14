@@ -22,22 +22,100 @@
     }
   },
   "packages": {
+    "lcod://tooling/array/append": {
+      "registry": "official"
+    },
+    "lcod://tooling/array/compact": {
+      "registry": "official"
+    },
+    "lcod://tooling/array/find_duplicates": {
+      "registry": "official"
+    },
+    "lcod://tooling/array/flatten": {
+      "registry": "official"
+    },
+    "lcod://tooling/array/length": {
+      "registry": "official"
+    },
+    "lcod://tooling/array/pluck": {
+      "registry": "official"
+    },
+    "lcod://tooling/fs/write_if_changed": {
+      "registry": "official"
+    },
+    "lcod://tooling/json/read_file": {
+      "registry": "official"
+    },
+    "lcod://tooling/json/stringify": {
+      "registry": "official"
+    },
+    "lcod://tooling/jsonl/from_objects": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/collect": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/duplicate_package_errors": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/normalize_catalog": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/normalize_package": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/normalize_registry": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/normalize_version": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/normalize_versions_doc": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/packages_map": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/refresh": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/validate": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/validate_package": {
+      "registry": "official"
+    },
+    "lcod://tooling/registry_catalog/write_outputs": {
+      "registry": "official"
+    },
     "lcod://tooling/registry/catalog/generate": {
       "registry": "official"
     },
-    "lcod://tooling/registry/source/load": {
-      "registry": "official"
-    },
-    "lcod://tooling/registry/resolution": {
+    "lcod://tooling/registry/fetch": {
       "registry": "official"
     },
     "lcod://tooling/registry/index": {
       "registry": "official"
     },
+    "lcod://tooling/registry/resolution": {
+      "registry": "official"
+    },
     "lcod://tooling/registry/select": {
       "registry": "official"
     },
-    "lcod://tooling/registry/fetch": {
+    "lcod://tooling/registry/source/load": {
+      "registry": "official"
+    },
+    "lcod://tooling/string/ensure_trailing_newline": {
+      "registry": "official"
+    },
+    "lcod://tooling/value/is_array": {
+      "registry": "official"
+    },
+    "lcod://tooling/value/is_object": {
+      "registry": "official"
+    },
+    "lcod://tooling/value/is_string_nonempty": {
       "registry": "official"
     }
   }

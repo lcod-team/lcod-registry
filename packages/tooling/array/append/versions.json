@@ -1,0 +1,10 @@
+{
+  "schema": "lcod-registry/versions@1",
+  "id": "lcod://tooling/array/append",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "manifest": "packages/tooling/array/append/0.1.0/manifest.json"
+    }
+  ]
+}

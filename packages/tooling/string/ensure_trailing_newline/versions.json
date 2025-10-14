@@ -1,0 +1,10 @@
+{
+  "schema": "lcod-registry/versions@1",
+  "id": "lcod://tooling/string/ensure_trailing_newline",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "manifest": "packages/tooling/string/ensure_trailing_newline/0.1.0/manifest.json"
+    }
+  ]
+}

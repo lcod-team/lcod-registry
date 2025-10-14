@@ -1,0 +1,10 @@
+{
+  "schema": "lcod-registry/versions@1",
+  "id": "lcod://tooling/registry_catalog/duplicate_package_errors",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "manifest": "packages/tooling/registry_catalog/duplicate_package_errors/0.1.0/manifest.json"
+    }
+  ]
+}

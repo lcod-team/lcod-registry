@@ -1,0 +1,10 @@
+{
+  "schema": "lcod-registry/versions@1",
+  "id": "lcod://tooling/value/is_string_nonempty",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "manifest": "packages/tooling/value/is_string_nonempty/0.1.0/manifest.json"
+    }
+  ]
+}

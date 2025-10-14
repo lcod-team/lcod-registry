@@ -1,0 +1,29 @@
+{
+  "schema": "lcod-registry/manifest@1",
+  "id": "lcod://tooling/fs/write_if_changed@0.1.0",
+  "publishedAt": "2025-10-14T19:11:24+02:00",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/lcod-team/lcod-components",
+    "commit": "4a569e82930c784d2b4f2a40a39e85daea774a80",
+    "path": "packages/std/components/tooling/fs.write_if_changed"
+  },
+  "files": [
+    {
+      "path": "packages/std/components/tooling/fs.write_if_changed/compose.yaml",
+      "sha256": "c354037433579b6c73ea540d70d4be6d27099232dfb34c69364104da573792c3",
+      "size": 1378
+    },
+    {
+      "path": "packages/std/components/tooling/fs.write_if_changed/lcp.toml",
+      "sha256": "e9c914ec636036e5f97b2cf55f7f702a6dba40dc72822e5ef07a8a42492a89c8",
+      "size": 916
+    },
+    {
+      "path": "packages/std/components/tooling/fs.write_if_changed/README.md",
+      "sha256": "6a7e6a5e909adf3847182edad7b1fed0fa9886ca5839e873bdb18a6918e97efd",
+      "size": 541
+    }
+  ],
+  "dependencies": []
+}

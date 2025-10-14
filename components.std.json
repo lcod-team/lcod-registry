@@ -1,106 +1,106 @@
 [
   {
     "id": "lcod://tooling/array/append@0.1.0",
-    "composePath": "lcod-components/components/tooling/array.append/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/array.append/compose.yaml"
   },
   {
     "id": "lcod://tooling/array/compact@0.1.0",
-    "composePath": "lcod-components/components/tooling/array.compact/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/array.compact/compose.yaml"
   },
   {
     "id": "lcod://tooling/array/find_duplicates@0.1.0",
-    "composePath": "lcod-components/components/tooling/array.find_duplicates/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/array.find_duplicates/compose.yaml"
   },
   {
     "id": "lcod://tooling/array/flatten@0.1.0",
-    "composePath": "lcod-components/components/tooling/array.flatten/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/array.flatten/compose.yaml"
   },
   {
     "id": "lcod://tooling/array/length@0.1.0",
-    "composePath": "lcod-components/components/tooling/array.length/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/array.length/compose.yaml"
   },
   {
     "id": "lcod://tooling/array/pluck@0.1.0",
-    "composePath": "lcod-components/components/tooling/array.pluck/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/array.pluck/compose.yaml"
   },
   {
     "id": "lcod://tooling/fs/write_if_changed@0.1.0",
-    "composePath": "lcod-components/components/tooling/fs.write_if_changed/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/fs.write_if_changed/compose.yaml"
   },
   {
     "id": "lcod://tooling/json/read_file@0.1.0",
-    "composePath": "lcod-components/components/tooling/json.read_file/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/json.read_file/compose.yaml"
   },
   {
     "id": "lcod://tooling/json/stringify@0.1.0",
-    "composePath": "lcod-components/components/tooling/json.stringify/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/json.stringify/compose.yaml"
   },
   {
     "id": "lcod://tooling/jsonl/from_objects@0.1.0",
-    "composePath": "lcod-components/components/tooling/jsonl.from_objects/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/jsonl.from_objects/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/collect@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.collect/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.collect/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/duplicate_package_errors@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.duplicate_package_errors/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.duplicate_package_errors/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/normalize_catalog@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.normalize_catalog/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.normalize_catalog/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/normalize_package@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.normalize_package/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.normalize_package/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/normalize_registry@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.normalize_registry/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.normalize_registry/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/normalize_version@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.normalize_version/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.normalize_version/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/normalize_versions_doc@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.normalize_versions_doc/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.normalize_versions_doc/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/packages_map@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.packages_map/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.packages_map/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/refresh@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.refresh/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.refresh/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/validate_package@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.validate_package/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.validate_package/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/validate@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.validate/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.validate/compose.yaml"
   },
   {
     "id": "lcod://tooling/registry_catalog/write_outputs@0.1.0",
-    "composePath": "lcod-components/components/tooling/registry_catalog.write_outputs/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/registry_catalog.write_outputs/compose.yaml"
   },
   {
     "id": "lcod://tooling/string/ensure_trailing_newline@0.1.0",
-    "composePath": "lcod-components/components/tooling/string.ensure_trailing_newline/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/string.ensure_trailing_newline/compose.yaml"
   },
   {
     "id": "lcod://tooling/value/is_array@0.1.0",
-    "composePath": "lcod-components/components/tooling/value.is_array/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/value.is_array/compose.yaml"
   },
   {
     "id": "lcod://tooling/value/is_object@0.1.0",
-    "composePath": "lcod-components/components/tooling/value.is_object/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/value.is_object/compose.yaml"
   },
   {
     "id": "lcod://tooling/value/is_string_nonempty@0.1.0",
-    "composePath": "lcod-components/components/tooling/value.is_string_nonempty/compose.yaml"
+    "composePath": "../lcod-components/packages/std/components/tooling/value.is_string_nonempty/compose.yaml"
   }
 ]

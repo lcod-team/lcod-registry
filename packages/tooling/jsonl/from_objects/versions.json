@@ -1,0 +1,10 @@
+{
+  "schema": "lcod-registry/versions@1",
+  "id": "lcod://tooling/jsonl/from_objects",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "manifest": "packages/tooling/jsonl/from_objects/0.1.0/manifest.json"
+    }
+  ]
+}

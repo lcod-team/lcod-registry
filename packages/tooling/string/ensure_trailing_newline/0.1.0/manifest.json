@@ -1,0 +1,29 @@
+{
+  "schema": "lcod-registry/manifest@1",
+  "id": "lcod://tooling/string/ensure_trailing_newline@0.1.0",
+  "publishedAt": "2025-10-14T19:11:24+02:00",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/lcod-team/lcod-components",
+    "commit": "4a569e82930c784d2b4f2a40a39e85daea774a80",
+    "path": "packages/std/components/tooling/string.ensure_trailing_newline"
+  },
+  "files": [
+    {
+      "path": "packages/std/components/tooling/string.ensure_trailing_newline/compose.yaml",
+      "sha256": "4394659a45ca1a3f7eb2f1e9d7b308509b06874540cdcc305454a7fd0d9236a3",
+      "size": 358
+    },
+    {
+      "path": "packages/std/components/tooling/string.ensure_trailing_newline/lcp.toml",
+      "sha256": "d360490c205eb9db5dd06f70df7176c9a15f6614f6ba472120ef5100c0066e1b",
+      "size": 598
+    },
+    {
+      "path": "packages/std/components/tooling/string.ensure_trailing_newline/README.md",
+      "sha256": "2da1b07ca107d3c55cc1c72dc20445bcc2153ecd3f76c356df6978582b61c32d",
+      "size": 369
+    }
+  ],
+  "dependencies": []
+}

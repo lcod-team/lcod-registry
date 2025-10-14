@@ -1,0 +1,29 @@
+{
+  "schema": "lcod-registry/manifest@1",
+  "id": "lcod://tooling/registry_catalog/normalize_version@0.1.0",
+  "publishedAt": "2025-10-14T19:11:24+02:00",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/lcod-team/lcod-components",
+    "commit": "4a569e82930c784d2b4f2a40a39e85daea774a80",
+    "path": "packages/std/components/tooling/registry_catalog.normalize_version"
+  },
+  "files": [
+    {
+      "path": "packages/std/components/tooling/registry_catalog.normalize_version/compose.yaml",
+      "sha256": "f5236802b784129c577931b7886431c15ccea73d8d44ad204de357209ae10b69",
+      "size": 2641
+    },
+    {
+      "path": "packages/std/components/tooling/registry_catalog.normalize_version/lcp.toml",
+      "sha256": "f060b7916777740e2086dd4538b1c2d412df8bce4dc494549cabbc0319d0dd14",
+      "size": 1305
+    },
+    {
+      "path": "packages/std/components/tooling/registry_catalog.normalize_version/README.md",
+      "sha256": "bf34ce18adcc75717408883d219d72ce79af8dda5b0a3aba5718f12ca5097ed5",
+      "size": 797
+    }
+  ],
+  "dependencies": []
+}

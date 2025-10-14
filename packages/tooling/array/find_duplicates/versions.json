@@ -1,0 +1,10 @@
+{
+  "schema": "lcod-registry/versions@1",
+  "id": "lcod://tooling/array/find_duplicates",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "manifest": "packages/tooling/array/find_duplicates/0.1.0/manifest.json"
+    }
+  ]
+}
