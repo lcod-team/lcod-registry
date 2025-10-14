@@ -84,12 +84,21 @@ async function importModule(root, relative) {
       console.warn(`Warning: unable to load components manifest at ${componentsManifestPath}: ${err.message}`);
     }
 
-    const ctx = new Context(baseRegistry);
-    if (componentsToRegister.length > 0) {
-      await ctx.call('lcod://tooling/resolver/register@1', {
-        components: componentsToRegister
-      });
-    }
+  const ctx = new Context(baseRegistry);
+  if (componentsToRegister.length > 0) {
+    await ctx.call('lcod://tooling/resolver/register@1', {
+      components: componentsToRegister
+    });
+    const snapshot = componentsToRegister
+      .map((entry) => ({
+        id: entry.id,
+        composePath: path.relative(repoRoot, entry.composePath)
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+    const snapshotPath = path.join(repoRoot, 'components.std.json');
+    await fs.writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf-8');
+    console.log(`Registered ${snapshot.length} components (snapshot written to ${path.relative(repoRoot, snapshotPath)})`);
+  }
     const { packagesJsonl, registryJson, warnings } = await ctx.call(
       'lcod://tooling/registry/catalog/generate@0.1.0',
       {
