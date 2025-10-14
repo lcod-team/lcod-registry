@@ -38,7 +38,7 @@ jobs:
           node-version: '20'
 
       - name: Install registry dependencies
-        run: npm ci
+        run: npm install --no-fund --no-audit
 
       - name: Install kernel dependencies
         run: npm ci
