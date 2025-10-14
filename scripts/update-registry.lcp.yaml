@@ -1,0 +1,26 @@
+
+compose:
+  - call: lcod://tooling/registry_catalog.refresh@0.1.0
+    in:
+      rootPath: $env.LCOD_REGISTRY_ROOT ?? '.'
+      catalogPath: 'catalog.json'
+    out:
+      refreshResult: $
+
+  - call: lcod://tooling/registry_catalog.write_outputs@0.1.0
+    in:
+      rootPath: $env.LCOD_REGISTRY_ROOT ?? '.'
+      packagesJsonl: $.refreshResult.packagesJsonl
+      registryJson: $.refreshResult.registryJson
+    out:
+      writeUpdates: updates
+
+  - call: lcod://impl/set@1
+    in:
+      errors: $.refreshResult.errors
+      warnings: $.refreshResult.warnings
+      updates: $.writeUpdates
+    out:
+      errors: errors
+      warnings: warnings
+      updates: updates

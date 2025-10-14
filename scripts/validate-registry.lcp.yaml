@@ -1,0 +1,16 @@
+
+compose:
+  - call: lcod://tooling/registry_catalog.validate@0.1.0
+    in:
+      rootPath: $env.LCOD_REGISTRY_ROOT ?? '.'
+      catalogPath: 'catalog.json'
+    out:
+      validation: $
+
+  - call: lcod://impl/set@1
+    in:
+      errors: $.validation.errors
+      packages: $.validation.packages
+    out:
+      errors: errors
+      packages: packages
