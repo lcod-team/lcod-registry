@@ -22,12 +22,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Checkout lcod-components
+        uses: actions/checkout@v4
+        with:
+          repository: lcod-team/lcod-components
+          path: lcod-components
+
       - name: Download run_compose
         run: |
           curl -sSL https://github.com/lcod-team/lcod-kernel-rs/releases/download/run-compose-v0.1.1/run-compose-linux-x86_64.tar.gz -o run-compose.tar.gz
           tar -xzf run-compose.tar.gz
           chmod +x run-compose
           echo "LCOD_HOME=$PWD/runtime" >> "$GITHUB_ENV"
+          echo "LCOD_RESOLVER_PATH=$PWD/lcod-components" >> "$GITHUB_ENV"
 
       - name: Validate registry
         run: ./run-compose --compose scripts/validate-registry.lcp.yaml
