@@ -42,6 +42,10 @@ async function importModule(root, relative) {
       '../lcod-kernel-js',
       '../../lcod-kernel-js'
     ]);
+    const componentsRoot = await locatePath('lcod-components repository', process.env.COMPONENTS_REPO_PATH, [
+      '../lcod-components',
+      '../../lcod-components'
+    ]);
 
     process.env.SPEC_REPO_PATH = specRoot;
 
@@ -63,7 +67,29 @@ async function importModule(root, relative) {
     );
     await registerRegistryComponents(baseRegistry);
 
+    const componentsManifestPath = path.join(componentsRoot, 'registry', 'components.std.json');
+    let componentsToRegister = [];
+    try {
+      const manifestContent = await fs.readFile(componentsManifestPath, 'utf-8');
+      const parsedManifest = JSON.parse(manifestContent);
+      if (Array.isArray(parsedManifest)) {
+        componentsToRegister = parsedManifest
+          .filter((entry) => entry && typeof entry.id === 'string' && typeof entry.composePath === 'string')
+          .map((entry) => ({
+            id: entry.id,
+            composePath: path.join(componentsRoot, entry.composePath)
+          }));
+      }
+    } catch (err) {
+      console.warn(`Warning: unable to load components manifest at ${componentsManifestPath}: ${err.message}`);
+    }
+
     const ctx = new Context(baseRegistry);
+    if (componentsToRegister.length > 0) {
+      await ctx.call('lcod://tooling/resolver/register@1', {
+        components: componentsToRegister
+      });
+    }
     const { packagesJsonl, registryJson, warnings } = await ctx.call(
       'lcod://tooling/registry/catalog/generate@0.1.0',
       {

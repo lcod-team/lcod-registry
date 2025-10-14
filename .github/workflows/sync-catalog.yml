@@ -32,6 +32,12 @@ jobs:
           repository: lcod-team/lcod-kernel-js
           path: lcod-kernel-js
 
+      - name: Checkout lcod-components
+        uses: actions/checkout@v4
+        with:
+          repository: lcod-team/lcod-components
+          path: lcod-components
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -51,6 +57,7 @@ jobs:
         env:
           SPEC_REPO_PATH: ${{ github.workspace }}/lcod-spec
           KERNEL_REPO_PATH: ${{ github.workspace }}/lcod-kernel-js
+          COMPONENTS_REPO_PATH: ${{ github.workspace }}/lcod-components
         run: npm run generate
 
       - name: Detect changes
