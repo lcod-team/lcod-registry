@@ -26,7 +26,7 @@ compose:
               console.log('register component', id, composePath.path);
             }
           }
-          return { components };
+          return { components, count: components.length };
         }
       imports:
         pathJoin: lcod://axiom/path/join@1
@@ -34,6 +34,7 @@ compose:
         tomlParse: lcod://axiom/toml/parse@1
     out:
       componentDefs: components
+      componentCount: count
 
   - call: lcod://tooling/resolver/register@1
     in:
@@ -45,10 +46,12 @@ compose:
     in:
       source: |
         async ({ state }) => {
+          console.log('workspace components prepared', state.prepared);
           console.log('registered components count', state.count);
           return {};
         }
       input:
+        prepared: $.componentCount
         count: $.registeredComponents
 
   - call: lcod://tooling/registry_catalog.validate@0.1.0
