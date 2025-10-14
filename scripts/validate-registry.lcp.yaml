@@ -8,6 +8,7 @@ compose:
             ? state.componentsRoot
             : '.';
           const manifestPath = await imports.pathJoin({ base: root, segment: 'packages/std/lcp.toml' });
+          console.log('register-components manifest', manifestPath.path);
           const manifestRaw = await imports.fsReadFile({ path: manifestPath.path, encoding: 'utf-8' });
           const manifestParsed = await imports.tomlParse({ text: manifestRaw.data ?? manifestRaw });
           const components = [];
@@ -20,6 +21,7 @@ compose:
               if (!id || !relPath) continue;
               const composePath = await imports.pathJoin({ base: root, segment: `${relPath}/compose.yaml` });
               components.push({ id, composePath: composePath.path });
+              console.log('register component', id, composePath.path);
             }
           }
           return { components };
