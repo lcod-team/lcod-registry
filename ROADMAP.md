@@ -8,6 +8,7 @@
 ## M1
 - Add `core/extract_city`, `core/weather`
 - CI: auto-validate (schemas + structure) and publish `.lcpkg` in Releases
+- [x] Smoke test std components resolution via registry (`scripts/tests/resolve-std.lcp.yaml`)
 
 ## M2
 - Per-component tags & releases

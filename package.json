@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "generate": "node scripts/update-registry.mjs",
-    "validate": "node scripts/validate-registry.mjs"
+    "validate": "node scripts/validate-registry.mjs",
+    "test:resolve-std": "node scripts/test-resolve-std.mjs"
   }
 }
