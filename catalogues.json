@@ -1,0 +1,18 @@
+{
+  "schema": "lcod-registry/catalogues@1",
+  "catalogues": [
+    {
+      "id": "tooling/std",
+      "description": "Standard tooling catalogue exported from lcod-components.",
+      "kind": "https",
+      "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/691029b3718e98e5f16fc578e9bf4c25ee3730b6/registry/components.std.json",
+      "commit": "691029b3718e98e5f16fc578e9bf4c25ee3730b6",
+      "checksum": "sha256-Z29ERyL0+ZCQd/DPwn6VrFRT9RIfdgOv/W0A3FvMQCU=",
+      "priority": 50,
+      "metadata": {
+        "sourceRepo": "https://github.com/lcod-team/lcod-components",
+        "manifestPath": "registry/components.std.json"
+      }
+    }
+  ]
+}

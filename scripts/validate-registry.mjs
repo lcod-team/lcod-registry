@@ -1,159 +1,147 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
 const errors = [];
 
-const addError = (message) => {
+function addError(message) {
   errors.push(message);
-};
+}
 
-const readJson = async (relativePath) => {
-  const absolutePath = path.join(repoRoot, relativePath);
-  try {
-    const content = await fs.readFile(absolutePath, 'utf-8');
-    return { path: absolutePath, value: JSON.parse(content) };
-  } catch (err) {
-    throw new Error(`Failed to read ${relativePath}: ${err.message}`);
-  }
-};
-
-const manifestPathFor = (pkgId, version) => {
-  return `packages/${pkgId.replace('lcod://', '').replace(/\\/g, '/')}/${version}/manifest.json`;
-};
-
-const toPosix = (segment) => segment.replace(/\\/g, '/');
-
-const compareSemverDesc = (prev, current) => {
-  const parse = (value) => value.split(/[.-]/).map((part) => (/^\d+$/.test(part) ? Number(part) : part));
-  const a = parse(prev);
-  const b = parse(current);
-  const len = Math.max(a.length, b.length);
-  for (let i = 0; i < len; i += 1) {
-    const av = a[i] ?? 0;
-    const bv = b[i] ?? 0;
-    if (typeof av === 'number' && typeof bv === 'number') {
-      if (av !== bv) return av > bv;
-    } else {
-      const as = String(av);
-      const bs = String(bv);
-      if (as !== bs) return as > bs;
+async function locatePath(name, envVar, fallbacks) {
+  if (envVar && envVar.length) {
+    const candidate = path.resolve(envVar);
+    try {
+      const stat = await fs.stat(candidate);
+      if (stat.isDirectory()) return candidate;
+    } catch (_) {
+      // ignore
     }
   }
-  return true;
-};
+  for (const fallback of fallbacks) {
+    const candidate = path.resolve(repoRoot, fallback);
+    try {
+      const stat = await fs.stat(candidate);
+      if (stat.isDirectory()) return candidate;
+    } catch (_) {
+      // ignore
+    }
+  }
+  throw new Error(`Unable to locate ${name}. Tried: ${[envVar, ...fallbacks].filter(Boolean).join(', ')}`);
+}
+
+function sha256Base64(buffer) {
+  return crypto.createHash('sha256').update(buffer).digest('base64');
+}
+
+async function readJson(relativePath) {
+  const absolutePath = path.join(repoRoot, relativePath);
+  const content = await fs.readFile(absolutePath, 'utf-8');
+  try {
+    return JSON.parse(content);
+  } catch (err) {
+    throw new Error(`Failed to parse ${relativePath}: ${err.message}`);
+  }
+}
 
 async function validate() {
-  const { value: catalog } = await readJson('catalog.json');
+  const catalogues = await readJson('catalogues.json');
 
-  if (!Array.isArray(catalog.packages)) {
-    addError('catalog.json: "packages" must be an array');
+  if (catalogues.schema !== 'lcod-registry/catalogues@1') {
+    addError('catalogues.json: schema must be "lcod-registry/catalogues@1"');
+    return;
+  }
+  if (!Array.isArray(catalogues.catalogues) || catalogues.catalogues.length === 0) {
+    addError('catalogues.json: catalogues array must be non-empty');
     return;
   }
 
-  const seenPackageIds = new Set();
+  const seenIds = new Set();
+  const allowedKinds = new Set(['https', 'http', 'git', 'file']);
 
-  for (const pkg of catalog.packages) {
-    if (!pkg || typeof pkg !== 'object') {
-      addError('catalog.json: invalid package entry (not an object)');
+  for (const entry of catalogues.catalogues) {
+    if (!entry || typeof entry !== 'object') {
+      addError('catalogues.json: invalid catalogue entry (not an object)');
       continue;
     }
-    const pkgId = pkg.id;
-    if (typeof pkgId !== 'string' || pkgId.length === 0) {
-      addError('catalog.json: package entry missing "id"');
+    const { id, url, kind, checksum, priority } = entry;
+    if (typeof id !== 'string' || id.length === 0) {
+      addError('catalogues.json: catalogue entry missing id');
       continue;
     }
-    if (seenPackageIds.has(pkgId)) {
-      addError(`catalog.json: duplicate package id ${pkgId}`);
+    if (seenIds.has(id)) {
+      addError(`catalogues.json: duplicate catalogue id ${id}`);
       continue;
     }
-    seenPackageIds.add(pkgId);
+    seenIds.add(id);
 
-    if (typeof pkg.versionsPath !== 'string' || pkg.versionsPath.length === 0) {
-      addError(`catalog.json: ${pkgId} missing "versionsPath"`);
-      continue;
+    if (typeof kind !== 'string' || !allowedKinds.has(kind)) {
+      addError(`catalogues.json: catalogue ${id} has invalid kind ${kind}`);
     }
-
-    let versions;
-    try {
-      ({ value: versions } = await readJson(pkg.versionsPath));
-    } catch (err) {
-      addError(err.message);
-      continue;
+    if (typeof url !== 'string' || url.length === 0) {
+      addError(`catalogues.json: catalogue ${id} missing url`);
     }
-
-    if (versions.id !== pkgId) {
-      addError(`${pkg.versionsPath}: id mismatch (expected ${pkgId}, found ${versions.id})`);
+    if (checksum !== undefined) {
+      if (typeof checksum !== 'string' || !/^sha256-[A-Za-z0-9+/=_-]+$/.test(checksum)) {
+        addError(`catalogues.json: catalogue ${id} has invalid checksum format`);
+      }
     }
-
-    if (!Array.isArray(versions.versions) || versions.versions.length === 0) {
-      addError(`${pkg.versionsPath}: versions array must be non-empty`);
-      continue;
+    if (priority !== undefined && (typeof priority !== 'number' || !Number.isInteger(priority))) {
+      addError(`catalogues.json: catalogue ${id} has invalid priority value`);
     }
+  }
 
-    let previousVersion = null;
-    const seenVersions = new Set();
+  if (errors.length > 0) {
+    return;
+  }
 
-    for (const entry of versions.versions) {
-      if (!entry || typeof entry !== 'object') {
-        addError(`${pkg.versionsPath}: invalid version entry (not an object)`);
-        continue;
-      }
-      const version = entry.version;
-      if (typeof version !== 'string' || version.length === 0) {
-        addError(`${pkg.versionsPath}: entry missing "version"`);
-        continue;
-      }
-      if (seenVersions.has(version)) {
-        addError(`${pkg.versionsPath}: duplicate version ${version}`);
-      }
-      seenVersions.add(version);
+  // Cross-check known catalogue against local components repository for determinism.
+  let componentsRoot = null;
+  try {
+    componentsRoot = await locatePath('lcod-components repository', process.env.COMPONENTS_REPO_PATH, [
+      '../lcod-components',
+      '../../lcod-components'
+    ]);
+  } catch (err) {
+    addError(err.message);
+    return;
+  }
 
-      if (previousVersion && !compareSemverDesc(previousVersion, version)) {
-        addError(`${pkg.versionsPath}: versions must be ordered newest to oldest (found ${previousVersion} before ${version})`);
-      }
-      previousVersion = version;
+  const stdEntry = catalogues.catalogues.find((entry) => entry.id === 'tooling/std');
+  if (!stdEntry) {
+    addError('catalogues.json: missing tooling/std catalogue entry');
+    return;
+  }
 
-      const manifestRelative = entry.manifest || manifestPathFor(pkgId.replace('lcod://', ''), version);
-      if (typeof manifestRelative !== 'string' || manifestRelative.length === 0) {
-        addError(`${pkg.versionsPath}: ${version} missing "manifest" field`);
-        continue;
-      }
+  const manifestRelative = 'registry/components.std.json';
+  const manifestPath = path.join(componentsRoot, manifestRelative);
+  let manifestContent;
+  try {
+    manifestContent = await fs.readFile(manifestPath);
+  } catch (err) {
+    addError(`Unable to read ${manifestRelative} from components repo: ${err.message}`);
+    return;
+  }
 
-      let manifest;
-      try {
-        ({ value: manifest } = await readJson(manifestRelative));
-      } catch (err) {
-        addError(err.message);
-        continue;
-      }
+  const expectedChecksum = `sha256-${sha256Base64(manifestContent)}`;
+  if (stdEntry.checksum && stdEntry.checksum !== expectedChecksum) {
+    addError(`catalogues.json: checksum mismatch for tooling/std (expected ${expectedChecksum}, found ${stdEntry.checksum})`);
+  }
 
-      const expectedId = `${pkgId}@${version}`;
-      if (manifest.id !== expectedId) {
-        addError(`${manifestRelative}: id mismatch (expected ${expectedId}, found ${manifest.id})`);
-      }
-      if (!manifest.source || typeof manifest.source !== 'object') {
-        addError(`${manifestRelative}: missing source metadata`);
-      } else {
-        if (manifest.source.commit === 'SPEC_COMMIT_PLACEHOLDER') {
-          addError(`${manifestRelative}: source.commit must not be SPEC_COMMIT_PLACEHOLDER`);
-        }
-      }
-      if (!Array.isArray(manifest.files) || manifest.files.length === 0) {
-        addError(`${manifestRelative}: files array must be non-empty`);
-      } else {
-        for (const fileEntry of manifest.files) {
-          if (!fileEntry || typeof fileEntry.path !== 'string') {
-            addError(`${manifestRelative}: invalid file entry (missing path)`);
-            continue;
-          }
-          if (typeof fileEntry.sha256 !== 'string' || fileEntry.sha256.length === 0) {
-            addError(`${manifestRelative}: file ${fileEntry.path} missing sha256`);
-          }
-        }
-      }
+  const gitResult = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: componentsRoot, encoding: 'utf-8' });
+  if (gitResult.status !== 0) {
+    addError(`Unable to determine components commit: ${gitResult.stderr || gitResult.stdout}`);
+  } else {
+    const commit = gitResult.stdout.trim();
+    if (stdEntry.commit && stdEntry.commit !== commit) {
+      addError(`catalogues.json: commit mismatch for tooling/std (expected ${commit}, found ${stdEntry.commit})`);
+    }
+    if (typeof stdEntry.url === 'string' && !stdEntry.url.includes(commit)) {
+      addError('catalogues.json: tooling/std url should embed the pinned commit');
     }
   }
 }

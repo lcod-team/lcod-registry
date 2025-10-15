@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 
 const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
@@ -27,120 +28,69 @@ async function locatePath(name, envVar, fallbacks) {
   throw new Error(`Unable to locate ${name}. Tried: ${[envVar, ...fallbacks].filter(Boolean).join(', ')}`);
 }
 
-async function importModule(root, relative) {
-  const target = path.join(root, relative);
-  return import(pathToFileURL(target));
+function sha256Base64(buffer) {
+  return crypto.createHash('sha256').update(buffer).digest('base64');
+}
+
+async function writeIfChanged(relativePath, content) {
+  const absolutePath = path.join(repoRoot, relativePath);
+  let previous = null;
+  try {
+    previous = await fs.readFile(absolutePath, 'utf-8');
+  } catch (_) {
+    // missing file is fine
+  }
+  if (previous === content) {
+    return false;
+  }
+  await fs.mkdir(path.dirname(absolutePath), { recursive: true });
+  await fs.writeFile(absolutePath, content, 'utf-8');
+  return true;
 }
 
 (async () => {
   try {
-    const specRoot = await locatePath('lcod-spec repository', process.env.SPEC_REPO_PATH, [
-      '../lcod-spec',
-      '../../lcod-spec'
-    ]);
-    const kernelRoot = await locatePath('lcod-kernel-js repository', process.env.KERNEL_REPO_PATH, [
-      '../lcod-kernel-js',
-      '../../lcod-kernel-js'
-    ]);
     const componentsRoot = await locatePath('lcod-components repository', process.env.COMPONENTS_REPO_PATH, [
       '../lcod-components',
       '../../lcod-components'
     ]);
 
-    process.env.SPEC_REPO_PATH = specRoot;
+    const manifestRelative = 'registry/components.std.json';
+    const manifestPath = path.join(componentsRoot, manifestRelative);
+    const manifestContent = await fs.readFile(manifestPath);
+    const checksum = `sha256-${sha256Base64(manifestContent)}`;
 
-    const { Registry, Context } = await importModule(kernelRoot, 'src/registry.js');
-    const { registerNodeCore, registerNodeResolverAxioms } = await importModule(kernelRoot, 'src/core/index.js');
-    const { registerDemoAxioms } = await importModule(kernelRoot, 'src/axioms.js');
-    const { registerFlowPrimitives } = await importModule(kernelRoot, 'src/flow/register.js');
-    const { registerTooling } = await importModule(kernelRoot, 'src/tooling/index.js');
-    const { registerRegistryComponents } = await importModule(kernelRoot, 'src/tooling/registry-components.js');
-
-    const baseRegistry = registerTooling(
-      registerFlowPrimitives(
-        registerDemoAxioms(
-          registerNodeResolverAxioms(
-            registerNodeCore(new Registry())
-          )
-        )
-      )
-    );
-    await registerRegistryComponents(baseRegistry);
-
-    const componentsManifestPath = path.join(componentsRoot, 'registry', 'components.std.json');
-    let componentsToRegister = [];
-    try {
-      const manifestContent = await fs.readFile(componentsManifestPath, 'utf-8');
-      const parsedManifest = JSON.parse(manifestContent);
-      if (Array.isArray(parsedManifest)) {
-        componentsToRegister = parsedManifest
-          .filter((entry) => entry && typeof entry.id === 'string' && typeof entry.composePath === 'string')
-          .map((entry) => ({
-            id: entry.id,
-            composePath: path.join(componentsRoot, entry.composePath)
-          }));
-      }
-    } catch (err) {
-      console.warn(`Warning: unable to load components manifest at ${componentsManifestPath}: ${err.message}`);
+    const gitResult = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: componentsRoot, encoding: 'utf-8' });
+    if (gitResult.status !== 0) {
+      throw new Error(`Unable to determine components commit: ${gitResult.stderr || gitResult.stdout}`);
     }
+    const commit = gitResult.stdout.trim();
 
-  const ctx = new Context(baseRegistry);
-  if (componentsToRegister.length > 0) {
-    await ctx.call('lcod://tooling/resolver/register@1', {
-      components: componentsToRegister
-    });
-    const snapshot = componentsToRegister
-      .map((entry) => ({
-        id: entry.id,
-        composePath: path.relative(repoRoot, entry.composePath)
-      }))
-      .sort((a, b) => a.id.localeCompare(b.id));
-    const snapshotPath = path.join(repoRoot, 'components.std.json');
-    await fs.writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf-8');
-    console.log(`Registered ${snapshot.length} components (snapshot written to ${path.relative(repoRoot, snapshotPath)})`);
-  }
-    const { packagesJsonl, registryJson, warnings } = await ctx.call(
-      'lcod://tooling/registry/catalog/generate@0.1.0',
-      {
-        rootPath: repoRoot,
-        catalogPath: 'catalog.json'
-      }
-    );
+    const urlPath = manifestRelative.replace(/\\/g, '/');
+    const rawUrl = `https://raw.githubusercontent.com/lcod-team/lcod-components/${commit}/${urlPath}`;
 
-    if (Array.isArray(warnings) && warnings.length > 0) {
-      console.error('Registry generation produced warnings:');
-      for (const warning of warnings) {
-        console.error(`- ${warning}`);
-      }
-      process.exitCode = 1;
-      return;
-    }
-
-    const writeIfChanged = async (target, content) => {
-      const absolute = path.join(repoRoot, target);
-      let previous = null;
-      try {
-        previous = await fs.readFile(absolute, 'utf-8');
-      } catch (_) {
-        // missing file
-      }
-      if (previous === content) {
-        return false;
-      }
-      await fs.writeFile(absolute, content, 'utf-8');
-      return true;
+    const payload = {
+      schema: 'lcod-registry/catalogues@1',
+      catalogues: [
+        {
+          id: 'tooling/std',
+          description: 'Standard tooling catalogue exported from lcod-components.',
+          kind: 'https',
+          url: rawUrl,
+          commit,
+          checksum,
+          priority: 50,
+          metadata: {
+            sourceRepo: 'https://github.com/lcod-team/lcod-components',
+            manifestPath: urlPath
+          }
+        }
+      ]
     };
 
-    const registryContent = `${JSON.stringify(registryJson, null, 2)}\n`;
-    const jsonlChanged = await writeIfChanged('packages.jsonl', packagesJsonl);
-    const registryChanged = await writeIfChanged('registry.json', registryContent);
-
-    const summary = [];
-    if (jsonlChanged) summary.push('packages.jsonl updated');
-    if (registryChanged) summary.push('registry.json updated');
-    if (!summary.length) summary.push('catalog up-to-date');
-
-    console.log(summary.join('; '));
+    const nextContent = `${JSON.stringify(payload, null, 2)}\n`;
+    const changed = await writeIfChanged('catalogues.json', nextContent);
+    console.log(changed ? 'catalogues.json updated' : 'catalogues.json up-to-date');
   } catch (err) {
     console.error(err instanceof Error ? err.stack || err.message : err);
     process.exitCode = 1;

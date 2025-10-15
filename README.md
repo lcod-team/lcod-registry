@@ -1,71 +1,60 @@
 # lcod-registry
 
-Official Git registry for LCOD components. The repository stores immutable
-manifests and a generated catalogue (`packages.jsonl`, `registry.json`) that
-clients and kernels consume via the helpers published in
-[`lcod-spec`](https://github.com/lcod-team/lcod-spec).
+Official pointer registry for LCOD catalogues. Instead of mirroring component
+manifests, the repository now exports a small `catalogues.json` file describing
+where each upstream catalogue lives (URL, pinned commit, checksum). Resolvers
+merge this metadata with their own `sources.json` to discover catalogues.
 
 ## Repository layout
 
 ```
-catalog.json                           # declarative list of registries/namespaces/packages
-packages/
-  <namespace>/<component>/versions.json  # append-only list of published versions
-  <namespace>/<component>/<version>/manifest.json
-packages.jsonl                         # generated JSON Lines catalogue
-registry.json                          # generated registry metadata (namespaces + package map)
-scripts/update-registry.mjs            # regenerate the catalogue via LCOD kernel
-scripts/validate-registry.mjs          # sanity checks for catalog/versions/manifests
+catalogues.json                       # list of catalogues and how to fetch them
+scripts/update-registry.mjs            # refresh catalogues.json from local checkouts
+scripts/validate-registry.mjs          # sanity checks for the pointer file
+scripts/test-resolve-std.mjs           # ensures the std catalogue pointer matches components
 ```
-
-Each `manifest.json` points at the source repository and enumerates the files that
-make up the component version. The catalogue is generated from `catalog.json` and
-all `versions.json` files by the LCOD component
-`lcod://tooling/registry/catalog/generate@0.1.0`.
 
 ## Workflow
 
-1. **Add / update a release**
-   - Update the relevant `packages/<namespace>/<name>/versions.json` with the new
-     entry (new versions must be appended at the top of the array).
-   - Create the associated `manifest.json` describing the artefact.
-2. **Validate the catalogue**
-   ```bash
-   npm run validate
-   ```
-   Ensures every package declared in `catalog.json` has matching versions and
-   manifests, and that releases are ordered newest → oldest.
-3. **Regenerate the derived files**
+1. **Refresh the catalogue pointers**
    ```bash
    npm run generate
    ```
-   Runs the LCOD generator component through the Node kernel and rewrites
-   `packages.jsonl` / `registry.json` when needed.
-4. **Commit & push** – if `npm run generate` produced changes, commit them with
-   the release payload. The CI workflow checks for drift on pull requests and,
-   on direct pushes, commits the catalogue update automatically (using the
-   `[registry ci]` marker to prevent loops).
+   Looks for `../lcod-components` (or `COMPONENTS_REPO_PATH`) and rewrites
+   `catalogues.json` with the latest commit + checksum for
+   `registry/components.std.json`.
+
+2. **Validate**
+   ```bash
+   npm run validate
+   ```
+   Checks schema, field types, and cross-validates the pinned commit & checksum
+   against the local `lcod-components` checkout. The same script runs in CI.
+
+3. **Optional smoke test**
+   ```bash
+   npm run test:resolve-std
+   ```
+   Performs the same integrity checks as the validator but prints additional
+   context, making it convenient while iterating locally.
+
+4. **Commit & push** – once the pointer is updated (usually when a new version is
+   published in `lcod-components`), commit the regenerated `catalogues.json`.
 
 ## Continuous Integration
 
-`.github/workflows/sync-catalog.yml`:
-- fetches `lcod-spec` and `lcod-kernel-js`
-- runs `npm run validate`
-- runs `npm run generate`
-- on pull requests: fails when the catalogue is out of sync
-- on pushes: commits updated artefacts with message
-  `chore(registry): sync catalogue [registry ci]`
+`.github/workflows/sync-catalog.yml` still runs `npm run validate` to ensure the
+pointer file matches the expected shape. Once kernels consume `catalogues.json`
+there is no catalogue drift to maintain.
 
-## Published helpers
+## Adding new catalogues
 
-| Component ID                                   | Version | Source repository |
-| ---------------------------------------------- | ------- | ----------------- |
-| `lcod://tooling/registry/catalog/generate`     | 0.1.0   | `lcod-spec`       |
-| `lcod://tooling/registry/source/load`          | 0.1.0   | `lcod-spec`       |
-| `lcod://tooling/registry/resolution`           | 0.1.0   | `lcod-spec`       |
-| `lcod://tooling/registry/index`                | 0.1.0   | `lcod-spec`       |
-| `lcod://tooling/registry/select`               | 0.1.0   | `lcod-spec`       |
-| `lcod://tooling/registry/fetch`                | 0.1.0   | `lcod-spec`       |
+When a new upstream catalogue becomes available:
 
-New releases will be appended to the relevant `versions.json` files and propagated
-by the generator.
+1. Update `scripts/update-registry.mjs` to append a new entry with its metadata
+   (id, description, priority, and how to fetch it). Ideally pin a commit and
+   publish a checksum to keep the supply chain auditable.
+2. Re-run the `generate` and `validate` scripts.
+3. Commit the change alongside any documentation updates.
+
+This keeps the registry lightweight while making catalogue updates auditable.

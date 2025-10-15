@@ -8,8 +8,8 @@
 ## M1
 - Add `core/extract_city`, `core/weather`
 - CI: auto-validate (schemas + structure) and publish `.lcpkg` in Releases
-- [x] Smoke test std components resolution via registry (`scripts/tests/resolve-std.lcp.yaml`)
-- [ ] Adopt catalogue-of-catalogues format (no duplicate manifests in repo)
+- [x] Smoke test std components resolution via registry (`scripts/test-resolve-std.mjs`)
+- [x] Adopt catalogue-of-catalogues format (no duplicate manifests in repo)
 - [ ] Add resolver sources file scaffold + docs for configuring additional registries
 
 ## M2
