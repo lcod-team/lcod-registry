@@ -51,6 +51,7 @@ async function writeIfChanged(relativePath, content) {
 (async () => {
   try {
     const componentsRoot = await locatePath('lcod-components repository', process.env.COMPONENTS_REPO_PATH, [
+      'lcod-components',
       '../lcod-components',
       '../../lcod-components'
     ]);

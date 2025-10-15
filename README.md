@@ -20,7 +20,7 @@ scripts/test-resolve-std.mjs           # ensures the std catalogue pointer match
    ```bash
    npm run generate
    ```
-   Looks for `../lcod-components` (or `COMPONENTS_REPO_PATH`) and rewrites
+   Looks for `./lcod-components` (or the parent directories, or `COMPONENTS_REPO_PATH`) and rewrites
    `catalogues.json` with the latest commit + checksum for
    `registry/components.std.json`.
 

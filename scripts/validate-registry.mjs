@@ -103,6 +103,7 @@ async function validate() {
   let componentsRoot = null;
   try {
     componentsRoot = await locatePath('lcod-components repository', process.env.COMPONENTS_REPO_PATH, [
+      'lcod-components',
       '../lcod-components',
       '../../lcod-components'
     ]);

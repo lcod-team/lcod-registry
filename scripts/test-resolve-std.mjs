@@ -14,6 +14,7 @@ async function locateComponentsRoot() {
   const envPath = process.env.COMPONENTS_REPO_PATH;
   const candidates = [
     envPath,
+    path.resolve(repoRoot, 'lcod-components'),
     path.resolve(repoRoot, '../lcod-components'),
     path.resolve(repoRoot, '../../lcod-components')
   ].filter(Boolean);
