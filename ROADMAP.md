@@ -16,3 +16,8 @@
 - Per-component tags & releases
 - Optional `index.json` for discovery
 - Generate searchable catalog (for RAG)
+
+## M3 — MCP-assisted authoring support
+- Define MCP endpoints for registry interactions (list, reserve namespace, publish component revisions).
+- Expose catalogue metadata in a machine-friendly format for MCP clients and RAG ingestion.
+- Automate validation/sign-off flow so MCP-created components can land via PR with consistent checks.
