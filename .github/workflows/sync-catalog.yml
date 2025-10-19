@@ -6,6 +6,11 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+  repository_dispatch:
+    types:
+      - registry-sync-request
 
 permissions:
   contents: write
@@ -50,15 +55,15 @@ jobs:
         run: npm ci
         working-directory: lcod-kernel-js
 
-      - name: Validate registry
-        run: npm run validate
-
       - name: Generate catalogue
         env:
           SPEC_REPO_PATH: ${{ github.workspace }}/lcod-spec
           KERNEL_REPO_PATH: ${{ github.workspace }}/lcod-kernel-js
           COMPONENTS_REPO_PATH: ${{ github.workspace }}/lcod-components
         run: npm run generate
+
+      - name: Validate registry
+        run: npm run validate
 
       - name: Detect changes
         id: diff
