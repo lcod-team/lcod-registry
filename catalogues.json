@@ -13,19 +13,6 @@
         "sourceRepo": "https://github.com/lcod-team/lcod-components",
         "manifestPath": "registry/components.std.json"
       }
-    },
-    {
-      "id": "testkit/std",
-      "description": "LCOD testkit components for cross-kernel test orchestration.",
-      "kind": "https",
-      "url": "https://raw.githubusercontent.com/lcod-team/lcod-testkit/97c809259366bcceccec4637d897b2ff04edae37/registry/components.std.json",
-      "commit": "97c809259366bcceccec4637d897b2ff04edae37",
-      "checksum": "sha256-tXOTzfai/hlS7S2shoZC6TJ/e9F8b1J1SwoTUGgkvDc=",
-      "priority": 60,
-      "metadata": {
-        "sourceRepo": "https://github.com/lcod-team/lcod-testkit",
-        "manifestPath": "registry/components.std.json"
-      }
     }
   ]
 }
