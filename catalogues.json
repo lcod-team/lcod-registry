@@ -5,12 +5,25 @@
       "id": "tooling/std",
       "description": "Standard tooling catalogue exported from lcod-components.",
       "kind": "https",
-      "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/42183afa6a1a68fd8f197009ef3eca87593b7b05/registry/components.std.json",
-      "commit": "42183afa6a1a68fd8f197009ef3eca87593b7b05",
-      "checksum": "sha256-gBhP+GbTJv0i4ZBUSfA4nXeAYfvcdc12o+UhjDeSKD4=",
+      "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/a590625828f12fa8774d34a7732eb7a8d247bc1d/registry/components.std.json",
+      "commit": "a590625828f12fa8774d34a7732eb7a8d247bc1d",
+      "checksum": "sha256-Qjev2PL2GZ2q0fy7Lm0uwe6Forw24mCOTLk8En7oQjk=",
       "priority": 50,
       "metadata": {
         "sourceRepo": "https://github.com/lcod-team/lcod-components",
+        "manifestPath": "registry/components.std.json"
+      }
+    },
+    {
+      "id": "testkit/std",
+      "description": "LCOD testkit components for cross-kernel test orchestration.",
+      "kind": "https",
+      "url": "https://raw.githubusercontent.com/lcod-team/lcod-testkit/97c809259366bcceccec4637d897b2ff04edae37/registry/components.std.json",
+      "commit": "97c809259366bcceccec4637d897b2ff04edae37",
+      "checksum": "sha256-tXOTzfai/hlS7S2shoZC6TJ/e9F8b1J1SwoTUGgkvDc=",
+      "priority": 60,
+      "metadata": {
+        "sourceRepo": "https://github.com/lcod-team/lcod-testkit",
         "manifestPath": "registry/components.std.json"
       }
     }
