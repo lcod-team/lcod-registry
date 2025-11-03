@@ -5,8 +5,8 @@
       "id": "tooling/std",
       "description": "Standard tooling catalogue exported from lcod-components.",
       "kind": "https",
-      "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/f6bee49910cf5da6ad9e0b5a4ef1fd5efd25a8c5/registry/components.std.json",
-      "commit": "f6bee49910cf5da6ad9e0b5a4ef1fd5efd25a8c5",
+      "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/d78e6886f5ac5d6f65ab6b90930f8fe12baeae62/registry/components.std.json",
+      "commit": "d78e6886f5ac5d6f65ab6b90930f8fe12baeae62",
       "checksum": "sha256-WyVMrY8J22MhSSP8UE8TJDBfZAL0EMHCvkdMbkolRD4=",
       "priority": 50,
       "metadata": {
