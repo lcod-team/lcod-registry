@@ -63,6 +63,34 @@ async function locateComponentsRoot() {
       throw new Error('catalogues.json: tooling/std url must embed the pinned commit');
     }
 
+    const jsonlContent = await fs.readFile(path.join(repoRoot, 'catalogues.jsonl'), 'utf-8');
+    const lines = jsonlContent.split(/\r?\n/).filter((line) => line.trim().length > 0);
+    if (lines.length < 2) {
+      throw new Error('catalogues.jsonl missing entries');
+    }
+    const toolingList = lines
+      .slice(1)
+      .map((line, index) => {
+        try {
+          return JSON.parse(line);
+        } catch (err) {
+          throw new Error(`catalogues.jsonl invalid JSON on line ${index + 2}: ${err.message}`);
+        }
+      })
+      .find((entry) => entry && entry.id === 'tooling/std');
+    if (!toolingList) {
+      throw new Error('catalogues.jsonl: tooling/std entry missing');
+    }
+    if (toolingList.url !== stdEntry.url) {
+      throw new Error('catalogues.jsonl: tooling/std url does not match catalogues.json entry');
+    }
+    if (!toolingList.metadata || toolingList.metadata.commit !== commit) {
+      throw new Error('catalogues.jsonl: metadata.commit mismatch for tooling/std');
+    }
+    if (!toolingList.metadata || toolingList.metadata.checksum !== expectedChecksum) {
+      throw new Error('catalogues.jsonl: metadata.checksum mismatch for tooling/std');
+    }
+
     console.log('Tooling/std catalogue pointer verified successfully.');
   } catch (err) {
     console.error(err instanceof Error ? err.stack || err.message : err);

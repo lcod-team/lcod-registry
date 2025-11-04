@@ -8,7 +8,6 @@
       "url": "https://raw.githubusercontent.com/lcod-team/lcod-components/72efc538e89eecccd90f4107b3120eb27b2e69a1/registry/components.std.json",
       "commit": "72efc538e89eecccd90f4107b3120eb27b2e69a1",
       "checksum": "sha256-YjMc8/51mnfk37cJzsUlKT8qpsG9RHQ2XdeZp5UD4W4=",
-      "priority": 50,
       "metadata": {
         "sourceRepo": "https://github.com/lcod-team/lcod-components",
         "manifestPath": "registry/components.std.json"

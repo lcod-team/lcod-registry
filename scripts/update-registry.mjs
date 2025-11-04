@@ -80,7 +80,6 @@ async function writeIfChanged(relativePath, content) {
           url: rawUrl,
           commit,
           checksum,
-          priority: 50,
           metadata: {
             sourceRepo: 'https://github.com/lcod-team/lcod-components',
             manifestPath: urlPath
@@ -92,6 +91,28 @@ async function writeIfChanged(relativePath, content) {
     const nextContent = `${JSON.stringify(payload, null, 2)}\n`;
     const changed = await writeIfChanged('catalogues.json', nextContent);
     console.log(changed ? 'catalogues.json updated' : 'catalogues.json up-to-date');
+
+    const jsonlLines = [
+      JSON.stringify({
+        type: 'manifest',
+        schema: 'lcod-manifest/list@1',
+        id: 'lcod-registry/catalogues',
+        description: 'Official LCOD catalogue pointers'
+      }),
+      JSON.stringify({
+        type: 'list',
+        id: 'tooling/std',
+        url: rawUrl,
+        metadata: {
+          sourceRepo: 'https://github.com/lcod-team/lcod-components',
+          manifestPath: urlPath,
+          commit,
+          checksum
+        }
+      })
+    ];
+    const jsonlChanged = await writeIfChanged('catalogues.jsonl', `${jsonlLines.join('\n')}\n`);
+    console.log(jsonlChanged ? 'catalogues.jsonl updated' : 'catalogues.jsonl up-to-date');
   } catch (err) {
     console.error(err instanceof Error ? err.stack || err.message : err);
     process.exitCode = 1;

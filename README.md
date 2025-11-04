@@ -1,14 +1,17 @@
 # lcod-registry
 
 Official pointer registry for LCOD catalogues. Instead of mirroring component
-manifests, the repository now exports a small `catalogues.json` file describing
-where each upstream catalogue lives (URL, pinned commit, checksum). Resolvers
-merge this metadata with their own `sources.json` to discover catalogues.
+manifests, the repository now exports lightweight manifest lists
+(`catalogues.json` for legacy resolvers and `catalogues.jsonl` for the new
+streaming pipeline) describing where each upstream catalogue lives
+(URL, pinned commit, checksum). Resolvers merge this metadata with their own
+sources configuration to discover catalogues.
 
 ## Repository layout
 
 ```
-catalogues.json                       # list of catalogues and how to fetch them
+catalogues.json                       # legacy pointer list (JSON) with priority fields
+catalogues.jsonl                      # streaming manifest list for JSONL-aware resolvers
 scripts/update-registry.mjs            # refresh catalogues.json from local checkouts
 scripts/validate-registry.mjs          # sanity checks for the pointer file
 scripts/test-resolve-std.mjs           # ensures the std catalogue pointer matches components
@@ -22,7 +25,8 @@ scripts/test-resolve-std.mjs           # ensures the std catalogue pointer match
    ```
    Looks for `./lcod-components` (or the parent directories, or `COMPONENTS_REPO_PATH`) and rewrites
    `catalogues.json` with the latest commit + checksum for
-   `registry/components.std.json`.
+   `registry/components.std.json`. The JSONL file is regenerated alongside the
+   JSON pointer so both formats stay in sync.
 
 2. **Validate**
    ```bash
@@ -39,7 +43,8 @@ scripts/test-resolve-std.mjs           # ensures the std catalogue pointer match
    context, making it convenient while iterating locally.
 
 4. **Commit & push** – once the pointer is updated (usually when a new version is
-   published in `lcod-components`), commit the regenerated `catalogues.json`.
+   published in `lcod-components`), commit the regenerated `catalogues.json` and
+   `catalogues.jsonl`.
 
 ## Continuous Integration
 
@@ -52,8 +57,8 @@ there is no catalogue drift to maintain.
 When a new upstream catalogue becomes available:
 
 1. Update `scripts/update-registry.mjs` to append a new entry with its metadata
-   (id, description, priority, and how to fetch it). Ideally pin a commit and
-   publish a checksum to keep the supply chain auditable.
+   (id, description, and how to fetch it). Ideally pin a commit and publish a
+   checksum to keep the supply chain auditable.
 2. Re-run the `generate` and `validate` scripts.
 3. Commit the change alongside any documentation updates.
 

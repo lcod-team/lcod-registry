@@ -68,7 +68,7 @@ async function validate() {
       addError('catalogues.json: invalid catalogue entry (not an object)');
       continue;
     }
-    const { id, url, kind, checksum, priority } = entry;
+    const { id, url, kind, checksum } = entry;
     if (typeof id !== 'string' || id.length === 0) {
       addError('catalogues.json: catalogue entry missing id');
       continue;
@@ -89,9 +89,6 @@ async function validate() {
       if (typeof checksum !== 'string' || !/^sha256-[A-Za-z0-9+/=_-]+$/.test(checksum)) {
         addError(`catalogues.json: catalogue ${id} has invalid checksum format`);
       }
-    }
-    if (priority !== undefined && (typeof priority !== 'number' || !Number.isInteger(priority))) {
-      addError(`catalogues.json: catalogue ${id} has invalid priority value`);
     }
   }
 
@@ -143,6 +140,58 @@ async function validate() {
     }
     if (typeof stdEntry.url === 'string' && !stdEntry.url.includes(commit)) {
       addError('catalogues.json: tooling/std url should embed the pinned commit');
+    }
+
+    // Validate JSONL mirror
+    let jsonlContent;
+    try {
+      jsonlContent = await fs.readFile(path.join(repoRoot, 'catalogues.jsonl'), 'utf-8');
+    } catch (err) {
+      addError(`Unable to read catalogues.jsonl: ${err.message}`);
+      return;
+    }
+
+    const lines = jsonlContent.split(/\r?\n/).filter((line) => line.trim().length > 0);
+    if (lines.length === 0) {
+      addError('catalogues.jsonl is empty');
+      return;
+    }
+
+    let header;
+    try {
+      header = JSON.parse(lines[0]);
+    } catch (err) {
+      addError(`catalogues.jsonl: failed to parse header line: ${err.message}`);
+      return;
+    }
+    if (header.type !== 'manifest' || header.schema !== 'lcod-manifest/list@1') {
+      addError('catalogues.jsonl: header must declare type "manifest" and schema "lcod-manifest/list@1"');
+    }
+
+    const listEntries = [];
+    for (let index = 1; index < lines.length; index += 1) {
+      try {
+        const parsed = JSON.parse(lines[index]);
+        listEntries.push(parsed);
+      } catch (err) {
+        addError(`catalogues.jsonl: failed to parse line ${index + 1}: ${err.message}`);
+        return;
+      }
+    }
+
+    const toolingList = listEntries.find((entry) => entry && entry.id === 'tooling/std');
+    if (!toolingList) {
+      addError('catalogues.jsonl: missing tooling/std entry');
+      return;
+    }
+    if (toolingList.url !== stdEntry.url) {
+      addError('catalogues.jsonl: tooling/std url does not match catalogues.json');
+    }
+    if (!toolingList.metadata || toolingList.metadata.commit !== commit) {
+      addError('catalogues.jsonl: tooling/std metadata.commit must match pinned commit');
+    }
+    if (!toolingList.metadata || toolingList.metadata.checksum !== expectedChecksum) {
+      addError('catalogues.jsonl: tooling/std metadata.checksum must match catalogues.json checksum');
     }
   }
 }
