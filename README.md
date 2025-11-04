@@ -1,18 +1,16 @@
 # lcod-registry
 
 Official pointer registry for LCOD catalogues. Instead of mirroring component
-manifests, the repository now exports lightweight manifest lists
-(`catalogues.json` for legacy resolvers and `catalogues.jsonl` for the new
-streaming pipeline) describing where each upstream catalogue lives
-(URL, pinned commit, checksum). Resolvers merge this metadata with their own
-sources configuration to discover catalogues.
+manifests, the repository now exports a lightweight JSON Lines manifest
+(`catalogues.jsonl`) describing where each upstream catalogue lives (URL,
+pinned commit, checksum). Resolvers merge this metadata with their own sources
+configuration to discover catalogues.
 
 ## Repository layout
 
 ```
-catalogues.json                       # legacy pointer list (JSON) with priority fields
-catalogues.jsonl                      # streaming manifest list for JSONL-aware resolvers
-scripts/update-registry.mjs            # refresh catalogues.json from local checkouts
+catalogues.jsonl                      # streaming manifest list consumed by resolvers
+scripts/update-registry.mjs            # refresh catalogue pointers from local checkouts
 scripts/validate-registry.mjs          # sanity checks for the pointer file
 scripts/test-resolve-std.mjs           # ensures the std catalogue pointer matches components
 ```
@@ -24,9 +22,8 @@ scripts/test-resolve-std.mjs           # ensures the std catalogue pointer match
    npm run generate
    ```
    Looks for `./lcod-components` (or the parent directories, or `COMPONENTS_REPO_PATH`) and rewrites
-   `catalogues.json` with the latest commit + checksum for
-   `registry/components.std.json`. The JSONL file is regenerated alongside the
-   JSON pointer so both formats stay in sync.
+   `catalogues.jsonl` with the latest commit + checksum for
+   `registry/components.std.jsonl`.
 
 2. **Validate**
    ```bash
@@ -43,14 +40,13 @@ scripts/test-resolve-std.mjs           # ensures the std catalogue pointer match
    context, making it convenient while iterating locally.
 
 4. **Commit & push** – once the pointer is updated (usually when a new version is
-   published in `lcod-components`), commit the regenerated `catalogues.json` and
-   `catalogues.jsonl`.
+   published in `lcod-components`), commit the regenerated `catalogues.jsonl`.
 
 ## Continuous Integration
 
-`.github/workflows/sync-catalog.yml` still runs `npm run validate` to ensure the
-pointer file matches the expected shape. Once kernels consume `catalogues.json`
-there is no catalogue drift to maintain.
+`.github/workflows/sync-catalog.yml` runs `npm run validate` to ensure the
+pointer file matches the expected shape. Because the manifest references commit
+hashes, catalogue drift is immediately detectable.
 
 ## Adding new catalogues
 

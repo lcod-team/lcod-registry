@@ -56,7 +56,7 @@ async function writeIfChanged(relativePath, content) {
       '../../lcod-components'
     ]);
 
-    const manifestRelative = 'registry/components.std.json';
+    const manifestRelative = 'registry/components.std.jsonl';
     const manifestPath = path.join(componentsRoot, manifestRelative);
     const manifestContent = await fs.readFile(manifestPath);
     const checksum = `sha256-${sha256Base64(manifestContent)}`;
@@ -69,28 +69,6 @@ async function writeIfChanged(relativePath, content) {
 
     const urlPath = manifestRelative.replace(/\\/g, '/');
     const rawUrl = `https://raw.githubusercontent.com/lcod-team/lcod-components/${commit}/${urlPath}`;
-
-    const payload = {
-      schema: 'lcod-registry/catalogues@1',
-      catalogues: [
-        {
-          id: 'tooling/std',
-          description: 'Standard tooling catalogue exported from lcod-components.',
-          kind: 'https',
-          url: rawUrl,
-          commit,
-          checksum,
-          metadata: {
-            sourceRepo: 'https://github.com/lcod-team/lcod-components',
-            manifestPath: urlPath
-          }
-        }
-      ]
-    };
-
-    const nextContent = `${JSON.stringify(payload, null, 2)}\n`;
-    const changed = await writeIfChanged('catalogues.json', nextContent);
-    console.log(changed ? 'catalogues.json updated' : 'catalogues.json up-to-date');
 
     const jsonlLines = [
       JSON.stringify({

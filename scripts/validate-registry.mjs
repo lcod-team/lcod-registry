@@ -38,58 +38,63 @@ function sha256Base64(buffer) {
   return crypto.createHash('sha256').update(buffer).digest('base64');
 }
 
-async function readJson(relativePath) {
-  const absolutePath = path.join(repoRoot, relativePath);
-  const content = await fs.readFile(absolutePath, 'utf-8');
-  try {
-    return JSON.parse(content);
-  } catch (err) {
-    throw new Error(`Failed to parse ${relativePath}: ${err.message}`);
-  }
-}
-
 async function validate() {
-  const catalogues = await readJson('catalogues.json');
-
-  if (catalogues.schema !== 'lcod-registry/catalogues@1') {
-    addError('catalogues.json: schema must be "lcod-registry/catalogues@1"');
-    return;
-  }
-  if (!Array.isArray(catalogues.catalogues) || catalogues.catalogues.length === 0) {
-    addError('catalogues.json: catalogues array must be non-empty');
+  const jsonlPath = path.join(repoRoot, 'catalogues.jsonl');
+  let jsonlContent;
+  try {
+    jsonlContent = await fs.readFile(jsonlPath, 'utf-8');
+  } catch (err) {
+    addError(`Unable to read catalogues.jsonl: ${err.message}`);
     return;
   }
 
+  const lines = jsonlContent.split(/\r?\n/).map((line) => line.trim()).filter((line) => line.length > 0);
+  if (lines.length === 0) {
+    addError('catalogues.jsonl: file is empty');
+    return;
+  }
+
+  let header;
+  try {
+    header = JSON.parse(lines[0]);
+  } catch (err) {
+    addError(`catalogues.jsonl: failed to parse header: ${err.message}`);
+    return;
+  }
+  if (header.type !== 'manifest' || header.schema !== 'lcod-manifest/list@1') {
+    addError('catalogues.jsonl: header must declare type "manifest" and schema "lcod-manifest/list@1"');
+  }
+
+  const entries = [];
   const seenIds = new Set();
-  const allowedKinds = new Set(['https', 'http', 'git', 'file']);
-
-  for (const entry of catalogues.catalogues) {
-    if (!entry || typeof entry !== 'object') {
-      addError('catalogues.json: invalid catalogue entry (not an object)');
+  for (let index = 1; index < lines.length; index += 1) {
+    const raw = lines[index];
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (err) {
+      addError(`catalogues.jsonl: failed to parse line ${index + 1}: ${err.message}`);
       continue;
     }
-    const { id, url, kind, checksum } = entry;
-    if (typeof id !== 'string' || id.length === 0) {
-      addError('catalogues.json: catalogue entry missing id');
+    if (!parsed || typeof parsed !== 'object') {
+      addError(`catalogues.jsonl: entry at line ${index + 1} is not an object`);
+      continue;
+    }
+    const { id, url } = parsed;
+    if (typeof id !== 'string' || !id.length) {
+      addError(`catalogues.jsonl: entry at line ${index + 1} missing id`);
       continue;
     }
     if (seenIds.has(id)) {
-      addError(`catalogues.json: duplicate catalogue id ${id}`);
+      addError(`catalogues.jsonl: duplicate entry id ${id}`);
       continue;
     }
     seenIds.add(id);
-
-    if (typeof kind !== 'string' || !allowedKinds.has(kind)) {
-      addError(`catalogues.json: catalogue ${id} has invalid kind ${kind}`);
+    if (typeof url !== 'string' || !url.length) {
+      addError(`catalogues.jsonl: entry ${id} missing url`);
+      continue;
     }
-    if (typeof url !== 'string' || url.length === 0) {
-      addError(`catalogues.json: catalogue ${id} missing url`);
-    }
-    if (checksum !== undefined) {
-      if (typeof checksum !== 'string' || !/^sha256-[A-Za-z0-9+/=_-]+$/.test(checksum)) {
-        addError(`catalogues.json: catalogue ${id} has invalid checksum format`);
-      }
-    }
+    entries.push(parsed);
   }
 
   if (errors.length > 0) {
@@ -109,13 +114,13 @@ async function validate() {
     return;
   }
 
-  const stdEntry = catalogues.catalogues.find((entry) => entry.id === 'tooling/std');
+  const stdEntry = entries.find((entry) => entry.id === 'tooling/std');
   if (!stdEntry) {
-    addError('catalogues.json: missing tooling/std catalogue entry');
+    addError('catalogues.jsonl: missing tooling/std entry');
     return;
   }
 
-  const manifestRelative = 'registry/components.std.json';
+  const manifestRelative = 'registry/components.std.jsonl';
   const manifestPath = path.join(componentsRoot, manifestRelative);
   let manifestContent;
   try {
@@ -126,8 +131,9 @@ async function validate() {
   }
 
   const expectedChecksum = `sha256-${sha256Base64(manifestContent)}`;
-  if (stdEntry.checksum && stdEntry.checksum !== expectedChecksum) {
-    addError(`catalogues.json: checksum mismatch for tooling/std (expected ${expectedChecksum}, found ${stdEntry.checksum})`);
+  const metadata = stdEntry.metadata || {};
+  if (metadata.checksum && metadata.checksum !== expectedChecksum) {
+    addError(`catalogues.jsonl: metadata.checksum mismatch for tooling/std (expected ${expectedChecksum}, found ${metadata.checksum})`);
   }
 
   const gitResult = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: componentsRoot, encoding: 'utf-8' });
@@ -135,63 +141,11 @@ async function validate() {
     addError(`Unable to determine components commit: ${gitResult.stderr || gitResult.stdout}`);
   } else {
     const commit = gitResult.stdout.trim();
-    if (stdEntry.commit && stdEntry.commit !== commit) {
-      addError(`catalogues.json: commit mismatch for tooling/std (expected ${commit}, found ${stdEntry.commit})`);
+    if (metadata.commit && metadata.commit !== commit) {
+      addError(`catalogues.jsonl: metadata.commit mismatch for tooling/std (expected ${commit}, found ${metadata.commit})`);
     }
     if (typeof stdEntry.url === 'string' && !stdEntry.url.includes(commit)) {
-      addError('catalogues.json: tooling/std url should embed the pinned commit');
-    }
-
-    // Validate JSONL mirror
-    let jsonlContent;
-    try {
-      jsonlContent = await fs.readFile(path.join(repoRoot, 'catalogues.jsonl'), 'utf-8');
-    } catch (err) {
-      addError(`Unable to read catalogues.jsonl: ${err.message}`);
-      return;
-    }
-
-    const lines = jsonlContent.split(/\r?\n/).filter((line) => line.trim().length > 0);
-    if (lines.length === 0) {
-      addError('catalogues.jsonl is empty');
-      return;
-    }
-
-    let header;
-    try {
-      header = JSON.parse(lines[0]);
-    } catch (err) {
-      addError(`catalogues.jsonl: failed to parse header line: ${err.message}`);
-      return;
-    }
-    if (header.type !== 'manifest' || header.schema !== 'lcod-manifest/list@1') {
-      addError('catalogues.jsonl: header must declare type "manifest" and schema "lcod-manifest/list@1"');
-    }
-
-    const listEntries = [];
-    for (let index = 1; index < lines.length; index += 1) {
-      try {
-        const parsed = JSON.parse(lines[index]);
-        listEntries.push(parsed);
-      } catch (err) {
-        addError(`catalogues.jsonl: failed to parse line ${index + 1}: ${err.message}`);
-        return;
-      }
-    }
-
-    const toolingList = listEntries.find((entry) => entry && entry.id === 'tooling/std');
-    if (!toolingList) {
-      addError('catalogues.jsonl: missing tooling/std entry');
-      return;
-    }
-    if (toolingList.url !== stdEntry.url) {
-      addError('catalogues.jsonl: tooling/std url does not match catalogues.json');
-    }
-    if (!toolingList.metadata || toolingList.metadata.commit !== commit) {
-      addError('catalogues.jsonl: tooling/std metadata.commit must match pinned commit');
-    }
-    if (!toolingList.metadata || toolingList.metadata.checksum !== expectedChecksum) {
-      addError('catalogues.jsonl: tooling/std metadata.checksum must match catalogues.json checksum');
+      addError('catalogues.jsonl: tooling/std url should embed the pinned commit');
     }
   }
 }
